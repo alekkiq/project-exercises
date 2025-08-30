@@ -8,7 +8,7 @@ public class Customer {
     private static int customerCount = 0;
 
     private int id;
-    private long startTime;
+    private long startTime; // time when entering the queue
     private long endTime;
 
     public Customer(long startTime) {
