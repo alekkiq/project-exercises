@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 /*
  *   Orientation tasks
- *       Module 1.1, Task 4
+ *       Module 1.1, Task 5
  */
 public class ServicePoint {
     private LinkedList<Customer> queue = new LinkedList<>();
@@ -16,9 +16,26 @@ public class ServicePoint {
 
     public Customer removeFromQueue() {
         Customer c = this.queue.getLast();
+        c.setEndTime(System.nanoTime());
         this.queue.removeLast();
 
         return c;
+    }
+
+    public int getQueueLength() {
+        return this.queue.size();
+    }
+
+    public long getTimeDiff(long s, long e) {
+        return e - s;
+    }
+
+    public void sleep(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void serve() {
@@ -27,16 +44,25 @@ public class ServicePoint {
         long maxTime = 10_000;
         long serveTime = minTime + (long)((maxTime - minTime + 1) * Math.random());
 
-        long start = System.nanoTime();
+        sleep(serveTime);
+        Customer servedC = this.removeFromQueue();
 
-        Customer c = this.queue.getLast();
-
-
+        System.out.println("Served customer " + servedC.getId() + " in " + (serveTime / 1_000) + "s. Response time: " + servedC.getTimeSpent() + "s. Customers left: " + getQueueLength());
     }
 
     public static void main(String[] args) {
-        ServicePoint sp = new ServicePoint(new LinkedList<>());
+        ServicePoint sp = new ServicePoint();
+        CustomerGenerator gen = new CustomerGenerator(sp);
+        gen.generate(20);
 
+        System.out.println("Queue size: " + sp.getQueueLength());
 
+        while (sp.getQueueLength() > 0) {
+            sp.serve();
+        }
+
+        // this is not really representative, since all the customers
+        // are added to the queue simultaneously, leading to predictable
+        // serving times.
     }
 }
