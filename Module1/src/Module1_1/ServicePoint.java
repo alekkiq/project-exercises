@@ -10,6 +10,10 @@ import java.util.Scanner;
 public class ServicePoint {
     private LinkedList<Customer> queue = new LinkedList<>();
 
+    // values used for avg calculation
+    private int serveTimeSum = 0;
+    private int servedCustomers = 0;
+
     public void addToQueue(Customer customer) {
         this.queue.addFirst(customer);
     }
@@ -47,7 +51,14 @@ public class ServicePoint {
         sleep(serveTime);
         Customer servedC = this.removeFromQueue();
 
+        this.servedCustomers++;
+        this.serveTimeSum += (int)(serveTime / 1_000);
+
         System.out.println("Served customer " + servedC.getId() + " in " + (serveTime / 1_000) + "s. Response time: " + servedC.getTimeSpent() + "s. Customers left: " + getQueueLength());
+    }
+
+    public int calculateAverageServiceTime() {
+        return this.serveTimeSum / this.servedCustomers;
     }
 
     public static void main(String[] args) {
@@ -60,9 +71,11 @@ public class ServicePoint {
         while (sp.getQueueLength() > 0) {
             sp.serve();
         }
-
         // this is not really representative, since all the customers
         // are added to the queue simultaneously, leading to predictable
-        // serving times.
+        // response times.
+
+        // average calc
+        System.out.println("Average service time (s): " + sp.calculateAverageServiceTime());
     }
 }
