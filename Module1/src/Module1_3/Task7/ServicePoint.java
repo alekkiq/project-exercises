@@ -1,0 +1,58 @@
+package Module1_3.Task7;
+
+import java.util.LinkedList;
+
+public class ServicePoint {
+    private LinkedList<Customer> queue = new LinkedList<>();
+
+    // values used for avg calculation
+    private int serveTimeSum = 0;
+    private int servedCustomers = 0;
+
+    public void addToQueue(Customer customer) {
+        this.queue.addFirst(customer);
+    }
+
+    public Customer removeFromQueue() {
+        Customer c = this.queue.getLast();
+        c.setEndTime(System.nanoTime());
+        this.queue.removeLast();
+
+        return c;
+    }
+
+    public int getQueueLength() {
+        return this.queue.size();
+    }
+
+    public long getTimeDiff(long s, long e) {
+        return e - s;
+    }
+
+    public void sleep(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void serve() {
+        // randomize serving time between 1s - 10s
+        long minTime = 1_000;
+        long maxTime = 10_000;
+        long serveTime = minTime + (long)((maxTime - minTime + 1) * Math.random());
+
+        sleep(serveTime);
+        Customer servedC = this.removeFromQueue();
+
+        this.servedCustomers++;
+        this.serveTimeSum += (int)(serveTime / 1_000);
+
+        System.out.println("Served customer " + servedC.getId() + " in " + (serveTime / 1_000) + "s. Response time: " + servedC.getTimeSpent() + "s. Customers left: " + getQueueLength());
+    }
+
+    public int calculateAverageServiceTime() {
+        return this.serveTimeSum / this.servedCustomers;
+    }
+}
